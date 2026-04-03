@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rishton IT-Akademiyasi | Flutter Kursi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        flutter: '#02569B',
+                        flutterLight: '#35B4F0',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+        * { font-family: 'Inter', sans-serif; }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-40px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(40px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50%       { transform: translateY(-16px); }
+        }
+        @keyframes pulse-ring {
+            0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(53,180,240,0.5); }
+            70%  { transform: scale(1);    box-shadow: 0 0 0 18px rgba(53,180,240,0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(53,180,240,0); }
+        }
+        @keyframes shimmer {
+            0%   { background-position: -200% center; }
+            100% { background-position:  200% center; }
+        }
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes gradientShift {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes particle {
+            0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0.6; }
+            100% { transform: translateY(-100vh) translateX(30px) rotate(720deg); opacity: 0; }
+        }
+
+        /* ===== HERO ===== */
+        .hero-bg {
+            background: linear-gradient(135deg, #0a0f2e 0%, #02569B 50%, #0d1b4b 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease infinite;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2335B4F0' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(53,180,240,0.4);
+            animation: particle linear infinite;
+        }
+
+        .float-card {
+            animation: float 4s ease-in-out infinite;
+        }
+        .float-card:nth-child(2) { animation-delay: 1s; }
+        .float-card:nth-child(3) { animation-delay: 2s; }
+
+        .cta-btn {
+            animation: pulse-ring 2.5s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+        }
+
+        /* ===== SCROLL REVEAL ===== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-40px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .reveal-left.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .reveal-right {
+            opacity: 0;
+            transform: translateX(40px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .reveal-right.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.85);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .reveal-scale.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.3s; }
+        .delay-4 { transition-delay: 0.4s; }
+        .delay-5 { transition-delay: 0.5s; }
+
+        /* ===== GRADIENT TEXT ===== */
+        .gradient-text {
+            background: linear-gradient(90deg, #35B4F0, #ffffff, #35B4F0);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s linear infinite;
+        }
+
+        /* ===== CARDS ===== */
+        .feature-card {
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+        }
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: #35B4F0;
+            box-shadow: 0 20px 40px rgba(2, 86, 155, 0.15);
+        }
+
+        .project-card {
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+        .project-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 24px 48px rgba(2, 86, 155, 0.18);
+        }
+        .project-card-img {
+            transition: transform 0.5s ease;
+        }
+        .project-card:hover .project-card-img {
+            transform: scale(1.05);
+        }
+
+        /* ===== TIMELINE ===== */
+        .timeline-step {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .timeline-step::before {
+            content: '';
+            position: absolute;
+            left: -1px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, #02569B, #35B4F0);
+            border-radius: 2px;
+        }
+        .timeline-step:hover {
+            transform: translateX(6px);
+        }
+
+        /* ===== NAVBAR ===== */
+        .nav-glass {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        /* ===== BADGE ===== */
+        .badge-pulse {
+            animation: pulse-ring 2s infinite;
+        }
+
+        /* ===== SOON BADGE ===== */
+        .soon-badge {
+            background: linear-gradient(135deg, #f97316, #ef4444);
+        }
+
+        /* ===== STATS ===== */
+        .stat-number {
+            animation: countUp 0.8s ease forwards;
+        }
+
+        /* ===== PROGRESS BAR ===== */
+        .progress-bar {
+            width: 0%;
+            transition: width 1.5s ease;
+        }
+        .progress-bar.animate {
+            width: 100%;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #02569B; border-radius: 3px; }
+
+        /* ===== MENTOR AVATAR ===== */
+        .mentor-avatar {
+            background: linear-gradient(135deg, #02569B, #35B4F0);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased">
+
+    <!-- ===== NAVBAR ===== -->
+    <header class="nav-glass shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-flutter rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M14.314 0L2.3 12 6 15.7 21.686 0h-7.372zm.014 11.072L7.857 17.53l6.47 6.47H21.7l-6.46-6.468 6.46-6.46h-7.372z"/></svg>
+                </div>
+                <div class="text-xl font-bold text-flutter">
+                    Rishton IT<span class="text-gray-800">.</span>
+                </div>
+            </div>
+            <div class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600">
+                <a href="#dastur" class="hover:text-flutter transition">Dastur</a>
+                <a href="#mentor" class="hover:text-flutter transition">Mentor</a>
+                <a href="#ishlar" class="hover:text-flutter transition">Loyihalar</a>
+                <a href="#faq" class="hover:text-flutter transition">FAQ</a>
+            </div>
+            <a href="https://t.me/rishton_register_bot" target="_blank"
+               class="bg-flutter hover:bg-blue-700 text-white px-5 py-2.5 rounded-full font-semibold text-sm transition duration-300 flex items-center gap-2 shadow-md hover:shadow-lg">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.18 13.88l-2.965-.924c-.643-.204-.657-.643.136-.953l11.57-4.46c.537-.194 1.006.131.973.678z"/></svg>
+                Guruhga yozilish
+            </a>
+        </div>
+    </header>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero-bg py-24 md:py-32 px-4 sm:px-6 lg:px-8 text-center text-white relative">
+        <!-- Particles -->
+        <div class="particle" style="left:10%; animation-duration:8s; animation-delay:0s;"></div>
+        <div class="particle" style="left:25%; animation-duration:10s; animation-delay:2s; width:4px; height:4px;"></div>
+        <div class="particle" style="left:50%; animation-duration:7s; animation-delay:1s; width:8px; height:8px;"></div>
+        <div class="particle" style="left:75%; animation-duration:9s; animation-delay:3s;"></div>
+        <div class="particle" style="left:90%; animation-duration:6s; animation-delay:0.5s; width:4px; height:4px;"></div>
+
+        <div class="max-w-4xl mx-auto relative z-10">
+            <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white px-5 py-2 rounded-full text-sm font-semibold mb-8"
+                 style="animation: fadeInUp 0.6s ease forwards;">
+                <span class="w-2 h-2 bg-green-400 rounded-full badge-pulse inline-block"></span>
+                Qabul boshlandi — faqat <strong>15 ta</strong> joy mavjud
+            </div>
+
+            <h1 class="text-4xl md:text-6xl font-black mb-6 leading-tight"
+                style="animation: fadeInUp 0.7s ease 0.1s both;">
+                Rishtonda o'tirib<br>
+                <span class="gradient-text">xalqaro IT kompaniyalariga</span><br>
+                ishga kiring!
+            </h1>
+
+            <p class="text-lg md:text-xl text-blue-100 mb-10 max-w-2xl mx-auto"
+               style="animation: fadeInUp 0.7s ease 0.2s both;">
+                Noldan boshlab <strong>8 oy</strong> ichida tayyor portfolio va real tajribaga ega
+                <strong>Junior Flutter dasturchisi</strong>ga aylaning. Amaliyot — <strong>100%</strong>.
+            </p>
+
+            <!-- Stats Row -->
+            <div class="flex flex-wrap justify-center gap-8 mb-12"
+                 style="animation: fadeInUp 0.7s ease 0.3s both;">
+                <div class="text-center">
+                    <div class="text-3xl font-black text-flutterLight">8 oy</div>
+                    <div class="text-blue-200 text-sm">To'liq kurs</div>
+                </div>
+                <div class="w-px bg-white/20 hidden md:block"></div>
+                <div class="text-center">
+                    <div class="text-3xl font-black text-flutterLight">100%</div>
+                    <div class="text-blue-200 text-sm">Amaliyot</div>
+                </div>
+                <div class="w-px bg-white/20 hidden md:block"></div>
+                <div class="text-center">
+                    <div class="text-3xl font-black text-flutterLight">$300+</div>
+                    <div class="text-blue-200 text-sm">Junior maosh</div>
+                </div>
+                <div class="w-px bg-white/20 hidden md:block"></div>
+                <div class="text-center">
+                    <div class="text-3xl font-black text-flutterLight">4+</div>
+                    <div class="text-blue-200 text-sm">Yil tajriba</div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-center gap-4"
+                 style="animation: fadeInUp 0.7s ease 0.4s both;">
+                <a href="https://t.me/rishton_register_bot" target="_blank"
+                   class="cta-btn inline-flex items-center justify-center gap-3 bg-white text-flutter px-8 py-4 rounded-xl font-bold text-lg shadow-2xl hover:bg-blue-50 transition duration-300">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.18 13.88l-2.965-.924c-.643-.204-.657-.643.136-.953l11.57-4.46c.537-.194 1.006.131.973.678z"/></svg>
+                    Ro'yxatdan o'tish — Telegram
+                </a>
+                <a href="#dastur"
+                   class="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 text-white px-8 py-4 rounded-xl font-bold text-lg transition duration-300">
+                    Dastur bilan tanishish
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </a>
+            </div>
+        </div>
+
+        <!-- Floating tech badges -->
+        <div class="hidden lg:block absolute left-8 top-1/2 -translate-y-1/2">
+            <div class="float-card bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4 text-left mb-4 w-44">
+                <div class="text-2xl mb-1">📱</div>
+                <div class="text-sm font-semibold text-white">Android + iOS</div>
+                <div class="text-xs text-blue-200">Bitta kod bilan</div>
+            </div>
+            <div class="float-card bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4 text-left w-44">
+                <div class="text-2xl mb-1">🚀</div>
+                <div class="text-sm font-semibold text-white">Play Store'ga</div>
+                <div class="text-xs text-blue-200">Kurs oxirida yuklaysiz</div>
+            </div>
+        </div>
+        <div class="hidden lg:block absolute right-8 top-1/2 -translate-y-1/2">
+            <div class="float-card bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4 text-left mb-4 w-44" style="animation-delay:1.5s">
+                <div class="text-2xl mb-1">💰</div>
+                <div class="text-sm font-semibold text-white">$300–$800</div>
+                <div class="text-xs text-blue-200">Junior–Middle maosh</div>
+            </div>
+            <div class="float-card bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4 text-left w-44" style="animation-delay:2.5s">
+                <div class="text-2xl mb-1">🎯</div>
+                <div class="text-sm font-semibold text-white">Real loyiha</div>
+                <div class="text-xs text-blue-200">Haqiqiy buyurtma</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== WHY FLUTTER ===== -->
+    <section class="py-20 bg-gray-50 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-14 reveal">
+                <span class="text-flutter font-semibold text-sm uppercase tracking-wider">Nima uchun Flutter?</span>
+                <h2 class="text-3xl md:text-4xl font-bold mt-2">Bu kursda nima yutasiz?</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-sm reveal delay-1">
+                    <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-3xl mb-5">📱</div>
+                    <h3 class="text-xl font-bold mb-3">Bitta kod — Hamma joyda</h3>
+                    <p class="text-gray-600 leading-relaxed">Faqat Dart tilini o'rganasiz, yozgan ilovangiz esa <strong>Android</strong>, <strong>iOS</strong>, <strong>Web</strong> va <strong>Desktop</strong>da ishlaydi. Ikki platformaga ikki ish haqi.</p>
+                </div>
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-sm reveal delay-2">
+                    <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-3xl mb-5">🎯</div>
+                    <h3 class="text-xl font-bold mb-3">100% Amaliyot</h3>
+                    <p class="text-gray-600 leading-relaxed">Har bir mavzu nazariyadan keyin <strong>haqiqiy loyihada</strong> qo'llaniladi. Kurs oxirida siz emas — <strong>sizning ilovalaringiz</strong> gapiradi.</p>
+                </div>
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-sm reveal delay-3">
+                    <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-3xl mb-5">💼</div>
+                    <h3 class="text-xl font-bold mb-3">Tayyor Portfolio</h3>
+                    <p class="text-gray-600 leading-relaxed">Kursning oxirgi 2 oyida <strong>real buyurtmachilar</strong> uchun ilova yaratasiz. Bu sizning <strong>birinchi rasmiy ish tajribangiz</strong> bo'ladi.</p>
+                </div>
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-sm reveal delay-1">
+                    <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-3xl mb-5">🌍</div>
+                    <h3 class="text-xl font-bold mb-3">Xalqaro Bozor</h3>
+                    <p class="text-gray-600 leading-relaxed">Flutter — Google'ning texnologiyasi. Upwork, Toptal va Freelancer'da Flutter bo'yicha soatlik to'lov <strong>$20–$80</strong>. Rishtonda o'tirib ishlash mumkin.</p>
+                </div>
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-sm reveal delay-2">
+                    <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-3xl mb-5">🤝</div>
+                    <h3 class="text-xl font-bold mb-3">Mentorlik & Jamoa</h3>
+                    <p class="text-gray-600 leading-relaxed">Har hafta mentor bilan <strong>yuzma-yuz dars</strong>, Telegram guruhda 24/7 yordam. Siz bir o'zing emas — <strong>jamoa bilan o'sib borasiz</strong>.</p>
+                </div>
+                <div class="feature-card bg-white p-8 rounded-2xl shadow-sm reveal delay-3">
+                    <div class="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center text-3xl mb-5">💸</div>
+                    <h3 class="text-xl font-bold mb-3">Yuqori Daromad</h3>
+                    <p class="text-gray-600 leading-relaxed">Flutter mutaxassislariga talab juda yuqori. Yaxshi bitiruvchilarimiz mahalliy va xalqaro loyihalarga <strong>to'g'ridan-to'g'ri tavsiya qilinadi</strong>.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== ROADMAP ===== -->
+    <section id="dastur" class="py-20 bg-white px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-14 reveal">
+                <span class="text-flutter font-semibold text-sm uppercase tracking-wider">Yo'l xaritasi</span>
+                <h2 class="text-3xl md:text-4xl font-bold mt-2">8 Oylik Dastur</h2>
+                <p class="text-gray-500 mt-3">Har bir bosqich oldingi bilimlar ustiga quriladi</p>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="mb-10 reveal">
+                <div class="flex justify-between text-xs text-gray-400 mb-2">
+                    <span>Boshlash</span>
+                    <span>Junior darajasi</span>
+                </div>
+                <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div id="progressBar" class="progress-bar h-full bg-gradient-to-r from-flutter to-flutterLight rounded-full"></div>
+                </div>
+            </div>
+
+            <div class="space-y-6 pl-6">
+                <div class="timeline-step pl-6 reveal delay-1">
+                    <div class="flex items-start gap-4 p-6 border border-gray-100 bg-gray-50 rounded-2xl">
+                        <div class="flex-shrink-0">
+                            <div class="bg-flutter text-white font-bold px-4 py-2 rounded-xl text-sm">1–2 Oy</div>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-lg font-bold">Dart dasturlash tili va Algoritmik Fikrlash</h4>
+                            <p class="text-gray-600 mt-1">O'zgaruvchilar, funksiyalar, OOP, to'plamlar. Mantiqiy masalalar yechish va koder kabi o'ylash.</p>
+                            <div class="flex flex-wrap gap-2 mt-3">
+                                <span class="bg-blue-50 text-flutter text-xs px-3 py-1 rounded-full font-medium">Dart</span>
+                                <span class="bg-blue-50 text-flutter text-xs px-3 py-1 rounded-full font-medium">OOP</span>
+                                <span class="bg-blue-50 text-flutter text-xs px-3 py-1 rounded-full font-medium">Algoritmlar</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-step pl-6 reveal delay-2">
+                    <div class="flex items-start gap-4 p-6 border border-gray-100 bg-gray-50 rounded-2xl">
+                        <div class="flex-shrink-0">
+                            <div class="bg-flutter text-white font-bold px-4 py-2 rounded-xl text-sm">3–4 Oy</div>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-lg font-bold">Flutter UI va Zamonaviy Dizayn</h4>
+                            <p class="text-gray-600 mt-1">Widgetlar, layoutlar, animatsiyalar, Material 3 va responsive UI. Real ilovalar interfeysi yaratish.</p>
+                            <div class="flex flex-wrap gap-2 mt-3">
+                                <span class="bg-blue-50 text-flutter text-xs px-3 py-1 rounded-full font-medium">Flutter</span>
+                                <span class="bg-blue-50 text-flutter text-xs px-3 py-1 rounded-full font-medium">Animations</span>
+                                <span class="bg-blue-50 text-flutter text-xs px-3 py-1 rounded-full font-medium">Material 3</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-step pl-6 reveal delay-3">
+                    <div class="flex items-start gap-4 p-6 border border-gray-100 bg-gray-50 rounded-2xl">
+                        <div class="flex-shrink-0">
+                            <div class="bg-flutter text-white font-bold px-4 py-2 rounded-xl text-sm">5–6 Oy</div>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-lg font-bold">State Management, API va Firebase</h4>
+                            <p class="text-gray-600 mt-1">Bloc/Riverpod bilan holatni boshqarish, REST API, Firebase Auth va Firestore. Ilova arxitekturasi.</p>
+                            <div class="flex flex-wrap gap-2 mt-3">
+                                <span class="bg-blue-50 text-flutter text-xs px-3 py-1 rounded-full font-medium">Bloc</span>
+                                <span class="bg-blue-50 text-flutter text-xs px-3 py-1 rounded-full font-medium">Firebase</span>
+                                <span class="bg-blue-50 text-flutter text-xs px-3 py-1 rounded-full font-medium">REST API</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-step pl-6 reveal delay-4">
+                    <div class="flex items-start gap-4 p-6 border-2 border-flutterLight bg-blue-50 rounded-2xl relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 text-8xl opacity-10 select-none">🚀</div>
+                        <div class="flex-shrink-0">
+                            <div class="bg-gradient-to-r from-flutter to-flutterLight text-white font-bold px-4 py-2 rounded-xl text-sm">7–8 Oy</div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="text-lg font-bold">Amaliyot — Real Loyiha va Portfolio</h4>
+                                <span class="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-semibold">100% Amaliyot</span>
+                            </div>
+                            <p class="text-gray-600 mt-1">Jamoa bo'lib <strong>haqiqiy biznes uchun</strong> ilova yaratish, test qilish, Play Store va App Store'ga chiqarish. Intervyu tayyorgarlik.</p>
+                            <div class="flex flex-wrap gap-2 mt-3">
+                                <span class="bg-blue-100 text-flutter text-xs px-3 py-1 rounded-full font-medium">Real Loyiha</span>
+                                <span class="bg-blue-100 text-flutter text-xs px-3 py-1 rounded-full font-medium">Play Store</span>
+                                <span class="bg-blue-100 text-flutter text-xs px-3 py-1 rounded-full font-medium">Portfolio</span>
+                                <span class="bg-blue-100 text-flutter text-xs px-3 py-1 rounded-full font-medium">Intervyu</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== COMING SOON COURSES ===== -->
+    <section class="py-16 bg-gray-900 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-10 reveal">
+                <span class="text-flutterLight font-semibold text-sm uppercase tracking-wider">Kelajakdagi yo'nalishlar</span>
+                <h2 class="text-3xl font-bold text-white mt-2">Tez Orada Qo'shiladi</h2>
+                <p class="text-gray-400 mt-2">Flutter kursidan keyingi qadamlar — professional darajaga chiqish uchun</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Frontend -->
+                <div class="bg-gray-800 border border-gray-700 rounded-2xl p-8 relative overflow-hidden reveal-left">
+                    <div class="absolute top-4 right-4">
+                        <span class="soon-badge text-white text-xs font-bold px-3 py-1 rounded-full">TEZDA</span>
+                    </div>
+                    <div class="w-14 h-14 bg-yellow-500/10 rounded-2xl flex items-center justify-center text-3xl mb-5">🌐</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Frontend Development</h3>
+                    <p class="text-gray-400 mb-4">React, Next.js, TypeScript bilan zamonaviy web ilovalar yaratish. UI/UX asoslari va responsive dizayn.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-gray-700 text-gray-300 text-xs px-3 py-1 rounded-full">React</span>
+                        <span class="bg-gray-700 text-gray-300 text-xs px-3 py-1 rounded-full">Next.js</span>
+                        <span class="bg-gray-700 text-gray-300 text-xs px-3 py-1 rounded-full">TypeScript</span>
+                        <span class="bg-gray-700 text-gray-300 text-xs px-3 py-1 rounded-full">Tailwind</span>
+                    </div>
+                    <div class="mt-6 flex items-center gap-2 text-gray-500 text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        2026-yil kuzida
+                    </div>
+                </div>
+
+                <!-- Backend -->
+                <div class="bg-gray-800 border border-gray-700 rounded-2xl p-8 relative overflow-hidden reveal-right">
+                    <div class="absolute top-4 right-4">
+                        <span class="soon-badge text-white text-xs font-bold px-3 py-1 rounded-full">TEZDA</span>
+                    </div>
+                    <div class="w-14 h-14 bg-green-500/10 rounded-2xl flex items-center justify-center text-3xl mb-5">⚙️</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Backend Development</h3>
+                    <p class="text-gray-400 mb-4">Node.js yoki Python bilan server tomonini yaratish. REST API, ma'lumotlar bazasi va cloud xizmatlar.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-gray-700 text-gray-300 text-xs px-3 py-1 rounded-full">Node.js</span>
+                        <span class="bg-gray-700 text-gray-300 text-xs px-3 py-1 rounded-full">PostgreSQL</span>
+                        <span class="bg-gray-700 text-gray-300 text-xs px-3 py-1 rounded-full">Docker</span>
+                        <span class="bg-gray-700 text-gray-300 text-xs px-3 py-1 rounded-full">AWS</span>
+                    </div>
+                    <div class="mt-6 flex items-center gap-2 text-gray-500 text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        2026-yil kuzida
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== MENTOR ===== -->
+    <section id="mentor" class="py-20 bg-white px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div class="reveal-left">
+                <span class="text-flutter font-semibold text-sm uppercase tracking-wider">Mentor haqida</span>
+                <h2 class="text-3xl md:text-4xl font-bold mb-6 mt-2">Nazariyachidan emas,<br>amaliyotchidan o'rganing!</h2>
+                <p class="text-gray-600 text-lg mb-5 leading-relaxed">
+                    Men <strong>4+ yillik real tajribaga ega Senior Mobile Developer</strong>man. Faoliyatim davomida katta hajmdagi xalqaro ilovalar arxitekturasini yaratishda bevosita ishtirok etganman — faqat dars berish uchun emas, haqiqiy mahsulotlar uchun.
+                </p>
+                <p class="text-gray-600 text-lg mb-8 leading-relaxed">
+                    Sizga faqat kod yozishni emas — <strong>muammolarga koder kabi yechim topishni</strong>, ish intervyularidan muvaffaqiyatli o'tishni va professional jamoada ishlashni o'rgataman.
+                </p>
+
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="bg-blue-50 p-4 rounded-xl text-center">
+                        <div class="text-2xl font-black text-flutter">4+</div>
+                        <div class="text-sm text-gray-600">Yil tajriba</div>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-xl text-center">
+                        <div class="text-2xl font-black text-flutter">10+</div>
+                        <div class="text-sm text-gray-600">Yaratilgan ilova</div>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-xl text-center">
+                        <div class="text-2xl font-black text-flutter">5+</div>
+                        <div class="text-sm text-gray-600">Xalqaro loyiha</div>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-xl text-center">
+                        <div class="text-2xl font-black text-flutter">100%</div>
+                        <div class="text-sm text-gray-600">Amaliyot</div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 p-5 bg-gray-50 rounded-2xl border border-gray-100">
+                    <div class="mentor-avatar w-16 h-16 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0">
+                        👨‍💻
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-xl">Shaxriyar Tursunaliyev</h4>
+                        <p class="text-flutter font-medium">Senior Flutter Developer</p>
+                        <p class="text-gray-500 text-sm mt-0.5">4+ yil · 10+ ilova · Xalqaro tajriba</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reveal-right">
+                <div class="bg-gradient-to-br from-blue-50 to-white border border-blue-100 p-8 rounded-2xl shadow-xl">
+                    <h3 class="text-2xl font-bold mb-2 flex items-center gap-2">
+                        🎓 Ijtimoiy Loyiha
+                    </h3>
+                    <p class="text-flutter font-semibold mb-1">Hokim Granti</p>
+                    <p class="text-gray-600 mb-6">Iqtidorli yoshlarni qo'llab-quvvatlash maqsadida har bir guruhda grant o'rinlari ajratilgan:</p>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4 p-5 border-2 border-yellow-300 bg-gradient-to-r from-yellow-50 to-white rounded-xl">
+                            <div class="text-3xl">🥇</div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-gray-900">1 ta Oltin Grant</h4>
+                                <p class="text-sm text-gray-600">To'liq <strong>100% bepul</strong> o'qish</p>
+                            </div>
+                            <div class="text-yellow-500 font-black text-lg">FREE</div>
+                        </div>
+                        <div class="flex items-center gap-4 p-5 border-2 border-gray-200 bg-gradient-to-r from-gray-50 to-white rounded-xl">
+                            <div class="text-3xl">🥈</div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-gray-900">2 ta Kumush Grant</h4>
+                                <p class="text-sm text-gray-600"><strong>50% chegirma</strong> bilan o'qish</p>
+                            </div>
+                            <div class="text-gray-500 font-black text-lg">-50%</div>
+                        </div>
+                    </div>
+                    <div class="mt-5 bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm text-gray-700 leading-relaxed">
+                        <span class="font-semibold text-flutter">Qanday tanlanadi?</span><br>
+                        Guruh to'lishi bilan <strong>birinchi darsning o'zida</strong> barcha ishtirokchilar uchun <strong>mantiqiy masalalar</strong> o'tkaziladi. Eng yuqori ball to'plagan 3 kishi grant oladi. Oldindan tayyorgarlik shart emas — faqat mantiq kerak.
+                    </div>
+
+                    <a href="https://t.me/rishton_register_bot" target="_blank"
+                       class="mt-6 w-full flex items-center justify-center gap-2 bg-flutter hover:bg-blue-700 text-white py-4 rounded-xl font-bold transition duration-300 shadow-lg">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.18 13.88l-2.965-.924c-.643-.204-.657-.643.136-.953l11.57-4.46c.537-.194 1.006.131.973.678z"/></svg>
+                        Grant uchun ariza topshirish
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== MY PROJECTS ===== -->
+    <section id="ishlar" class="py-20 bg-gray-50 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-14 reveal">
+                <span class="text-flutter font-semibold text-sm uppercase tracking-wider">Mentor ishlari</span>
+                <h2 class="text-3xl md:text-4xl font-bold mt-2">Men Yaratgan Loyihalar</h2>
+                <p class="text-gray-500 mt-3">Siz ham kurs oxirida mana shunday ilovalarni yarata olasiz</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Project 1 -->
+                <div class="project-card bg-white rounded-2xl shadow-sm overflow-hidden reveal-scale delay-1">
+                    <div class="project-card-img h-48 bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center relative">
+                        <div class="text-6xl">🛒</div>
+                        <div class="absolute top-3 right-3 bg-white/20 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full font-medium">Flutter</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-lg mb-2">E-Commerce Ilovasi</h3>
+                        <p class="text-gray-500 text-sm mb-4">To'liq xarid qilish platformasi — mahsulot katalogi, savat, to'lov, buyurtma kuzatish. 10,000+ foydalanuvchi.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-blue-50 text-flutter text-xs px-2 py-1 rounded-full">Flutter</span>
+                            <span class="bg-blue-50 text-flutter text-xs px-2 py-1 rounded-full">Firebase</span>
+                            <span class="bg-blue-50 text-flutter text-xs px-2 py-1 rounded-full">Stripe</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="project-card bg-white rounded-2xl shadow-sm overflow-hidden reveal-scale delay-2">
+                    <div class="project-card-img h-48 bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center relative">
+                        <div class="text-6xl">🏥</div>
+                        <div class="absolute top-3 right-3 bg-white/20 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full font-medium">Flutter</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-lg mb-2">Tibbiyot Klinikasi App</h3>
+                        <p class="text-gray-500 text-sm mb-4">Shifokor bilan onlayn uchrashuvga yozilish, tarix, natijalar va to'lov. Android va iOS'da chiqarilgan.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-emerald-50 text-emerald-700 text-xs px-2 py-1 rounded-full">Flutter</span>
+                            <span class="bg-emerald-50 text-emerald-700 text-xs px-2 py-1 rounded-full">REST API</span>
+                            <span class="bg-emerald-50 text-emerald-700 text-xs px-2 py-1 rounded-full">Bloc</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 3 -->
+                <div class="project-card bg-white rounded-2xl shadow-sm overflow-hidden reveal-scale delay-3">
+                    <div class="project-card-img h-48 bg-gradient-to-br from-purple-500 to-violet-700 flex items-center justify-center relative">
+                        <div class="text-6xl">🚕</div>
+                        <div class="absolute top-3 right-3 bg-white/20 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full font-medium">Flutter</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-lg mb-2">Taxi Buyurtma Platformasi</h3>
+                        <p class="text-gray-500 text-sm mb-4">Real vaqtda haydovchi kuzatuvi, marshrutlar, narx hisoblash va to'lov. Google Maps integratsiyasi.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-purple-50 text-purple-700 text-xs px-2 py-1 rounded-full">Flutter</span>
+                            <span class="bg-purple-50 text-purple-700 text-xs px-2 py-1 rounded-full">Google Maps</span>
+                            <span class="bg-purple-50 text-purple-700 text-xs px-2 py-1 rounded-full">WebSocket</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 4 -->
+                <div class="project-card bg-white rounded-2xl shadow-sm overflow-hidden reveal-scale delay-1">
+                    <div class="project-card-img h-48 bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center relative">
+                        <div class="text-6xl">🍕</div>
+                        <div class="absolute top-3 right-3 bg-white/20 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full font-medium">Flutter</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-lg mb-2">Oziq-Ovqat Yetkazib Berish</h3>
+                        <p class="text-gray-500 text-sm mb-4">Restoran ilovasi — menyu, onlayn buyurtma, kurer kuzatuvi. Play Store'da faol.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-orange-50 text-orange-700 text-xs px-2 py-1 rounded-full">Flutter</span>
+                            <span class="bg-orange-50 text-orange-700 text-xs px-2 py-1 rounded-full">Firebase</span>
+                            <span class="bg-orange-50 text-orange-700 text-xs px-2 py-1 rounded-full">Riverpod</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 5 -->
+                <div class="project-card bg-white rounded-2xl shadow-sm overflow-hidden reveal-scale delay-2">
+                    <div class="project-card-img h-48 bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center relative">
+                        <div class="text-6xl">💬</div>
+                        <div class="absolute top-3 right-3 bg-white/20 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full font-medium">Flutter</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-lg mb-2">Chat va Messenjer</h3>
+                        <p class="text-gray-500 text-sm mb-4">Real vaqtda xabar almashish, rasm va fayl yuborish, guruh suhbatlari va bildirishnomalar.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-pink-50 text-pink-700 text-xs px-2 py-1 rounded-full">Flutter</span>
+                            <span class="bg-pink-50 text-pink-700 text-xs px-2 py-1 rounded-full">Firebase</span>
+                            <span class="bg-pink-50 text-pink-700 text-xs px-2 py-1 rounded-full">Push Notifications</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 6 -->
+                <div class="project-card bg-white rounded-2xl shadow-sm overflow-hidden reveal-scale delay-3">
+                    <div class="project-card-img h-48 bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center relative">
+                        <div class="text-6xl">📊</div>
+                        <div class="absolute top-3 right-3 bg-white/20 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full font-medium">Flutter</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-lg mb-2">Moliyaviy Boshqaruv</h3>
+                        <p class="text-gray-500 text-sm mb-4">Shaxsiy moliyani boshqarish — kirim-chiqim, grafiklar, byudjet rejalashtirish va hisobotlar.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-cyan-50 text-cyan-700 text-xs px-2 py-1 rounded-full">Flutter</span>
+                            <span class="bg-cyan-50 text-cyan-700 text-xs px-2 py-1 rounded-full">SQLite</span>
+                            <span class="bg-cyan-50 text-cyan-700 text-xs px-2 py-1 rounded-full">Charts</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-10 reveal">
+                <p class="text-gray-500 text-sm">va boshqa ko'plab loyihalar...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FAQ ===== -->
+    <section id="faq" class="py-20 bg-white px-4 sm:px-6 lg:px-8">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-center mb-14 reveal">
+                <span class="text-flutter font-semibold text-sm uppercase tracking-wider">Savollar</span>
+                <h2 class="text-3xl md:text-4xl font-bold mt-2">Ko'p Beriladigan Savollar</h2>
+            </div>
+            <div class="space-y-4">
+                <details class="group bg-gray-50 border border-gray-100 rounded-2xl reveal delay-1">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-gray-900 select-none">
+                        Menda umuman tajriba yo'q, qabul qilinamanmi?
+                        <svg class="w-5 h-5 text-flutter transition-transform group-open:rotate-180 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </summary>
+                    <div class="px-6 pb-6 text-gray-600 leading-relaxed">
+                        Ha, kurs mutlaqo noldan boshlanadi. Birinchi oyda Dart tilini o'rganasiz — oldingi tajriba talab qilinmaydi. Eng asosiysi: kompyuterdan foydalanishni bilish va o'rganishga bo'lgan kuchli xohish. <strong>Hozirgi vaqtda nolinchi talabalarimiz muvaffaqiyatli o'qiyapti.</strong>
+                    </div>
+                </details>
+
+                <details class="group bg-gray-50 border border-gray-100 rounded-2xl reveal delay-2">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-gray-900 select-none">
+                        Shaxsiy noutbuk kerakmi?
+                        <svg class="w-5 h-5 text-flutter transition-transform group-open:rotate-180 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </summary>
+                    <div class="px-6 pb-6 text-gray-600 leading-relaxed">
+                        Darslar maxsus jihozlangan xonada o'tiladi. Ammo uy vazifalarini va loyihalarni bajarish uchun <strong>o'rtacha parametrli shaxsiy noutbuk kuchli tavsiya etiladi</strong> (8GB RAM, 256GB SSD). Noutbuk yo'q bo'lsa, mentor bilan kelishish mumkin.
+                    </div>
+                </details>
+
+                <details class="group bg-gray-50 border border-gray-100 rounded-2xl reveal delay-3">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-gray-900 select-none">
+                        O'qish yakunida ish topishimga kafolat bormi?
+                        <svg class="w-5 h-5 text-flutter transition-transform group-open:rotate-180 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </summary>
+                    <div class="px-6 pb-6 text-gray-600 leading-relaxed">
+                        100% kafolat berish qiyin, chunki bu siz va bozorga ham bog'liq. Lekin biz sizga <strong>bozorda eng ko'p talab qilinadigan bilimlar</strong>, tayyor portfolio va <strong>to'g'ridan-to'g'ri tavsiya</strong> beramiz. Yaxshi o'zlashtirgan bitiruvchilarimiz mahalliy va xalqaro loyihalarga tavsiya qilinadi.
+                    </div>
+                </details>
+
+                <details class="group bg-gray-50 border border-gray-100 rounded-2xl reveal delay-4">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-gray-900 select-none">
+                        Darslar qachon va qayerda bo'ladi?
+                        <svg class="w-5 h-5 text-flutter transition-transform group-open:rotate-180 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </summary>
+                    <div class="px-6 pb-6 text-gray-600 leading-relaxed">
+                        Darslar <strong>Rishton shahrida</strong>, maxsus jihozlangan o'quv markazida o'tiladi. Jadval qabuldan keyin aniqlanadi. Ro'yxatdan o'tganingizdan so'ng barcha tafsilotlar Telegram orqali yuboriladi.
+                    </div>
+                </details>
+
+                <details class="group bg-gray-50 border border-gray-100 rounded-2xl reveal delay-5">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-gray-900 select-none">
+                        Kurs narxi qancha?
+                        <svg class="w-5 h-5 text-flutter transition-transform group-open:rotate-180 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </summary>
+                    <div class="px-6 pb-6 text-gray-600 leading-relaxed">
+                        Kurs narxi va to'lov imkoniyatlari haqida batafsil ma'lumot olish uchun <strong>Telegram botimizga yozing</strong>. Grant imkoniyatlari ham mavjud — 1 ta to'liq bepul, 2 ta 50% chegirmali o'rin. <strong>Grant tanlovi guruh to'lgan birinchi kunda</strong> mantiqiy masalalar orqali o'tkaziladi.
+                    </div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CTA ===== -->
+    <section id="qabul" class="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-flutter via-blue-700 to-blue-900"></div>
+        <div class="absolute inset-0 opacity-10"
+             style="background-image: radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 50%, white 1px, transparent 1px); background-size: 60px 60px;"></div>
+
+        <div class="max-w-3xl mx-auto text-center relative z-10">
+            <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white text-sm font-medium px-4 py-2 rounded-full mb-8 reveal">
+                <span class="w-2 h-2 bg-red-400 rounded-full badge-pulse inline-block"></span>
+                Faqat 15 ta joy — tez bo'ling!
+            </div>
+            <h2 class="text-4xl md:text-5xl font-black text-white mb-6 leading-tight reveal">
+                O'z kelajagingizni<br>bugun qurishni boshlang!
+            </h2>
+            <p class="text-xl text-blue-100 mb-10 reveal">
+                Ro'yxatdan o'ting — biz siz bilan <strong>24 soat ichida</strong> bog'lanamiz va barcha savollaringizga javob beramiz.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center reveal">
+                <a href="https://t.me/rishton_register_bot" target="_blank"
+                   class="inline-flex items-center justify-center gap-3 bg-white text-flutter px-10 py-5 rounded-2xl font-black text-xl shadow-2xl hover:bg-blue-50 transition duration-300 transform hover:scale-105">
+                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.18 13.88l-2.965-.924c-.643-.204-.657-.643.136-.953l11.57-4.46c.537-.194 1.006.131.973.678z"/></svg>
+                    @rishton_register_bot
+                </a>
+            </div>
+            <p class="text-blue-200 text-sm mt-6 reveal">Telegram orqali ro'yxatdan o'tish — bepul va majburiy emas</p>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="bg-gray-950 text-gray-400 py-10 px-4">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <div class="w-7 h-7 bg-flutter rounded-lg flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M14.314 0L2.3 12 6 15.7 21.686 0h-7.372zm.014 11.072L7.857 17.53l6.47 6.47H21.7l-6.46-6.468 6.46-6.46h-7.372z"/></svg>
+                </div>
+                <span class="text-white font-bold">Rishton IT Akademiyasi</span>
+            </div>
+            <p class="text-center text-sm">&copy; 2026 Rishton IT Akademiyasi. Barcha huquqlar himoyalangan.</p>
+            <a href="https://t.me/rishton_register_bot" target="_blank" class="text-flutterLight hover:text-white transition text-sm flex items-center gap-1">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.18 13.88l-2.965-.924c-.643-.204-.657-.643.136-.953l11.57-4.46c.537-.194 1.006.131.973.678z"/></svg>
+                @rishton_register_bot
+            </a>
+        </div>
+    </footer>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script>
+        // Scroll Reveal
+        const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+        revealElements.forEach(el => observer.observe(el));
+
+        // Progress bar animation
+        const progressBar = document.getElementById('progressBar');
+        const progressObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    progressBar.classList.add('animate');
+                }
+            });
+        }, { threshold: 0.5 });
+        if (progressBar) progressObserver.observe(progressBar);
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // Navbar shadow on scroll
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 10) {
+                header.classList.add('shadow-md');
+            } else {
+                header.classList.remove('shadow-md');
+            }
+        });
+    </script>
+</body>
+</html>
