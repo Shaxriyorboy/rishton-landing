@@ -245,6 +245,32 @@
             background: linear-gradient(135deg, #02569B, #35B4F0);
         }
     </style>
+
+    <!-- Firebase Analytics -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyBoIYyfdfHgLcuTQTpR4OpLO9mOCvn71dE",
+            authDomain: "rishton-landing.firebaseapp.com",
+            projectId: "rishton-landing",
+            storageBucket: "rishton-landing.firebasestorage.app",
+            messagingSenderId: "404732555206",
+            appId: "1:404732555206:web:8f4d319447718a3b580cc7",
+            measurementId: "G-YE4X32KDS9"
+        };
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll('a[href*="t.me"]').forEach(link => {
+                link.addEventListener("click", () => {
+                    logEvent(analytics, "telegram_bot_click", {
+                        source: link.closest("section")?.id || "unknown"
+                    });
+                });
+            });
+        });
+    </script>
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
